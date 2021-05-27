@@ -1,0 +1,230 @@
+/**
+ *This Ex14 class contains four static methods that each of them perform a different kind of function.
+ * @author Tommy Ashkenazi 
+ * @version 25/05/19
+ */
+public class Ex14
+{
+    /**This method represents a tool for collecting rainwater
+     * The depth of the tool and its edges are represented by the indexes in the array.
+    @param hights represents a graphic tool for collecting rainwater.
+    @return the amount of rainwater units that collected
+     */ 
+    //The time complexity = O(2n)==>O(n)
+    //The space complexity = O(n)
+    public static int waterVolume (int [] heights)
+    {
+        int i ; 
+        int highest = 0;  //The highest graph in the middle of the array
+        int leftEdge1 = 0; //The highest graph at the left side of the array
+        int [] rightEdge2 = new int [heights.length];//New array that indicators and save the current highest graph on the right side according to its location in the array
+        int numOfWaterUnits = 0 ;
+        for (i = heights.length - 1 ; i>=0 ; i--)//A loop that runs from the right side of the array and collecting the highest values according to their location in the array
+        {   //with that we can indicate where the graph is high and where the graph is low.
+            if(heights[i] > highest)
+            {
+                highest = heights[i];
+                rightEdge2[i] = highest;
+
+            }
+            else 
+            {
+                rightEdge2[i] = highest;
+
+            }
+        }
+        for (i = 0 ; i <heights.length ; i++)//This loop is for collecting the actual water units and indicating the left highest graph (left to the highest over all if there is any other)
+        {
+            //indicate the smaller value between left or right side to the highest graph and then reduce the current value that we are pointing at.
+            //if its negative it meens that the hight of our pointing graph is higher then ours "smaller value between left or right side" then we return 0 else we return the difference.
+            numOfWaterUnits += Math.max(Math.min(leftEdge1,rightEdge2[i]) - heights[i] , 0);
+            if (heights[i]>leftEdge1)
+            {
+                leftEdge1 = heights[i] ; 
+            }
+        }
+        return numOfWaterUnits;
+    }
+
+    /**This method count and returns the amount of values in a given array that the total sum of them is a even number.
+     * @param a represents a given array of numbers.
+     * @return the amount of values in a given array that the total sum of them are even number.
+     */
+    //Before:   The time complexity = O(2n^2)
+    //          The space complexity = O(n)
+    //After:    The time complexity = O(2n)==>O(n)
+    //          The space complexity = O(1)
+    //I've lowered the complexity of running time by removing one internal loop and also the private method f 
+    //Instead, I added another external loop that replaces the previous ones and improves running time.
+    public static int what (int [] a)
+    {
+        int temp1 = 0 ;
+        int temp2 = 0;
+        int res2 = 0;
+        int res1 = 0;
+        int i,j,k;
+        for( i = 0 ; i < a.length ; i++)// A loop that runs on the given array from left to right 
+        {
+            if(i>0)//if the index of the array bigger then 0 start to sum
+            {
+                res1 += a[i];
+            }
+            else
+            {
+                res1 = a[0];
+            }
+            if (res1 % 2 == 0 )//Condition to check whether the accrued value is even number
+            {
+                if (i+1 > temp1 )//if it is We have the current index value+1 to be the number of current amount of numbers equal to a even number
+                {
+                    temp1 = i+1 ;
+                }
+            }
+        }
+        for( j = a.length-1,k=0 ; j >0 && k<a.length ; j--,k++)// A loop that runs on the given array from right to left 
+        {   //k over here represents a normal count of values
+            if(j<a.length-1)//if the index of the array smaller then the array length start to sum
+            {
+                res2 += a[j];
+            }
+            else
+            {
+                res2 = a[a.length-1];
+            }
+            if (res2 % 2 == 0 )//Condition to check whether the accrued value is even number
+            {
+                if (k+1 > temp2 )//if it is We have the current index value+1 to be the number of current amount of numbers equal to a even number
+                {
+                    temp2 = k+1 ;
+                }
+            }
+        }
+        return Math.max(temp1,temp2);//The greater value between both represents the correct value according to the method.
+    }
+
+    /**This method receives a whole positive number called num and returns the number of solutions to the equation : "x1+x2+x3 = num"
+     * @param num a whole positive number
+     * @return the number of solutions to the equation : "x1+x2+x3 = num"
+     */
+    public static int solutions(int num)
+    {
+        if (num < 3 || num > 30)
+        {
+            return 0;
+        }
+        int [] array = new int [num];//An array that is going to contain the values that are going to be in the equation
+        int i = 0;//index in the array
+        int x = 0;//represents the value subtracted from the int num
+        return solutions(num ,i,array,x);
+    }
+
+    private static int solutions(int num , int i,int [] array,int x)//over here we are going to subtract and check all to possible outcomes by 
+    {
+        int count = 0;
+        if (i>0)//condition to overcome the first index that his value is 0
+        {
+            array[i-1] = x;//that x help us to indicate what numer we subtracted from num and add it to our array
+        }
+        if (num == 0 && i == 3 )//if we have managed to subtract 3 number from our verb "num" by round 3 we got our selfs a legit solution :)
+        {
+            count++;//count it
+            printArray(array,0,i);//a method that prints our array 
+        }
+        if(i<3)//here we are going to make a recursive call to any possible addition of numbers 1 to 10 and while we do that subtract the number from our varb and indicate what numer we subtracted .
+        {//as long as we're not ober 3 rounds that represents how deep the recursive call goes.
+            return 
+            solutions(num-1,i+1,array,1)+solutions(num-2,i+1,array,2)
+            +solutions(num-3,i+1,array,3)+solutions(num-4,i+1,array,4)
+            +solutions(num-5,i+1,array,5)+solutions(num-6,i+1,array,6)
+            +solutions(num-7,i+1,array,7)+solutions(num-8,i+1,array,8)
+            +solutions(num-9,i+1,array,9)+solutions(num-10,i+1,array,10);
+        }
+        return count;
+    }
+
+    private static void printArray(int[] array , int from , int to)//a recursive method that prints our array 
+    {
+        if (from < to-1)
+        {
+            System.out.print(array[from]+"+");
+            printArray(array,from+1,to);
+        }
+        if (from == to-1)
+        {
+            System.out.print(array[from]);
+            System.out.println();
+            printArray(array,from+1,to);
+        }
+    }
+
+    /**This method represents a two-dimensional array of whole positive numbers,a array of the same size consisting just zeros and and a certain number that is received from the user that called sum .
+     * the method checks whether there is any combination of cells that are equal to the given number (sum) only by "walking" left,right,up or down without walking diagonally
+     * and then if there is print the path that it did on the zeros array by puting 1's to mark the steps.
+     * @param mat represents a two-dimensional array of whole positive numbers
+     * @param sum represents a certain number that is received from the user
+     * @param path represents the path that it did 
+     * @return true/false whether there is any combination of cells that are equal to the given number (sum) at the mat array.
+     */
+    public static boolean findSum (int mat[][] , int sum, int path[][])
+    {
+        if(sum<=0)
+            return false;
+        return mainLoop(mat,sum,path,0,0);
+    }
+
+    private static boolean findSum(int mat[][] , int sum, int path[][],int row,int col )
+    {
+        final int matEdge = mat.length -1; 
+        if(!isValid(path,row,col,matEdge) )//checks if were still on our array boumds
+            return false;
+        if(sum == 0)//every round we subtracting the current value in the array from sum ,if it equals to 0 in some point we succeeded :)
+            return true;
+        path[row][col] = 1;//mark our step
+        //try to go down a cell
+        if (findSum(mat,sum-mat[row][col],path,row+1,col)) 
+        {
+            return true; 
+        }
+        //try to go right a cell
+        if (findSum(mat,sum-mat[row][col],path,row,col+1))
+        {
+            return true;
+        }
+        //try to go up a cell
+        if  (findSum(mat,sum-mat[row][col],path,row-1,col))
+        {
+            return true;
+        }
+        //try to go left a cell
+        if (findSum(mat,sum-mat[row][col],path,row,col-1))
+        {
+            return true;
+        }
+        path[row][col] = 0;//if not, delete our mark
+        return false;
+    }
+
+    private static boolean isValid(int [][]path,int row , int col,int matEdge )//Reference method that checks if the specific index is in the array limits and it were not been on this cell already
+    {
+        if (((row>=0)&&(row<=matEdge))&&((col>=0)&&(col<=matEdge)&& path[row][col] != 1))
+            return true;
+        return false;
+    }
+
+    private static boolean mainLoop(int [][]mat,int sum,int [][]path,int row,int col )//A recursive call method that works as a loop  
+    {   // every time promoting index of col in 1 and if it on the edge setting col to 0 going down a row and start again
+        if(row==mat.length)
+            return false;
+        int nextRow = row;
+        int nextCol = col+1;
+        if(nextCol== mat.length)
+        {
+            nextRow = row+1;
+            nextCol = 0;
+        }
+        if(findSum(mat,sum,path,row,col))
+            return true;
+        return mainLoop(mat,sum,path,nextRow,nextCol);
+    }
+}
+

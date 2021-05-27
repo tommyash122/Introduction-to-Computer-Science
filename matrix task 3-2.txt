@@ -1,0 +1,208 @@
+/**
+ * This class Matrix represents a two-dimensional array represented by integers in range of 0-255.
+ * The matrix represents a two dimensional image in black and white when the numbers represent 
+ * shades of gray in the picture when 0 is white and 255 is black.
+ * 
+ * @author Tommy Ashkenazi 
+ * @version 18/04/19
+ */
+public class Matrix
+{
+    private int[][] _matrix;
+
+    private final int MAX_NUM_MATRIX = 255;
+    private final int MIN_NUM_MATRIX = 0;
+    /**
+     *  
+     *  Constructs Matrix from a two-dimensional array;
+     *  the dimensions as well as the valus of this Matrix will be the same as the dimensions and values of the two-dimensional array.
+     *  @param array the array to copy from. 
+     */
+    public Matrix(int[][] array)
+    {   
+        _matrix = new int[array.length][array[0].length];
+        for(int i = 0 ; i<array.length ; i++)//two loops that copies the values from the accepted parameter array to our new one.
+        {
+            for(int j = 0 ; j<array[0].length ; j++)
+            {
+                _matrix[i][j] = array[i][j];
+            }
+        }
+
+    }
+
+    /**
+     * 
+     * constructs size1 by size2 Matrix of zeros.
+     * @param size1 Determines the number of rows in the array.
+     * @param size2 Determines the number of columns in the array
+     */
+    public Matrix(int size1, int size2)//two accepted parameter sizes that determines the rows length and the columnss length.
+
+    {
+        _matrix = new int[size1][size2]; 
+    }
+
+    /**
+    Returns a string representation of this Matrix.
+    @over toString in class java.lang.Object*/
+    public String toString()
+    {
+        int temp = 0 ;
+        String row = "";
+
+        for(int i = 0 ; i<_matrix.length ; i++)
+        { 
+            for (int j = 0 ; j<_matrix[0].length ; )
+            {
+                temp = _matrix[i][j];
+                j++;
+                if( j<_matrix[0].length)
+                {
+                    row += temp+"\t" ;
+                }
+                if (j==_matrix[0].length)//after receiving two values to the row we go down a line. 
+                {
+                    row += temp+"\n" ;
+                }
+            }
+        }
+        return row;
+
+    }
+
+    /**
+     * The method returns a negative image of each point in the image (array cell).
+     * image that was black becomes white image that was white becomes black, All shades of gray are turning as well.
+     * @return the new Matrix and its new values.
+     */
+
+    public Matrix makeNegative()
+    {
+        Matrix newMatrix = new Matrix(_matrix);
+        for(int i = 0 ; i<_matrix.length ; i++)
+        {
+            for(int j = 0 ; j<_matrix[0].length ; j++)
+            {
+                newMatrix._matrix[i][j] = ((_matrix[i][j]-255)*(-1));//Determines the counter value of the image shade based on our 0-255 range. 
+            }
+        }
+        return newMatrix;
+    }
+
+    /**
+     * A private method that gets an array cell and determines whether or not is a part of the array.
+     * @param row  The row numner that the cell should be.
+     * @param column  the column number that the cell should be.
+     * @return true if this specific cell is a part of the array and false if it doesn't.
+     */
+    private boolean isValid(int row , int column)//Reference method that checks if the specific index is in the array limits.
+    {
+        return(((row>-1)&&(row<_matrix.length))&&((column>-1)&&(column<_matrix[0].length)));
+
+    }
+
+    /** 
+     * This method returns the resulting image of image Leveling.
+     * Leveling operation is done by every cell in the current frame becomes the new image average value with its neighbours based on the current frame.
+     * @return the new cell average value with its neighbours based on the current frame.
+     */
+    public Matrix imageFilterAverage()//this method count and calculate the avarage of our current cell with all of its neighbours.
+    {
+        Matrix newMatrix = new Matrix(_matrix);
+
+        for(int i = 0 ; i<_matrix.length ; i++)
+        {
+            for(int j = 0 ; j<_matrix[0].length ; j++)
+            {
+                int counter = 0;
+                newMatrix._matrix[i][j] = _matrix[i][j];
+                counter++;
+                if(newMatrix.isValid(i-1,j))//conditions to check if there is a cell above our current one/\
+                {
+                    newMatrix._matrix[i][j] += _matrix[i-1][j];
+                    counter++;
+                    if(newMatrix.isValid(i-1,j-1))//only if there is a cell above our current one we check if there is one left to ours above.<
+                    {
+                        newMatrix._matrix[i][j] += _matrix[i-1][j-1]; 
+                        counter++;
+                    }
+                }
+                if(newMatrix.isValid(i+1,j))//conditions to check if there is a cell below our current one\/
+                {
+                    newMatrix._matrix[i][j] += _matrix[i+1][j];
+                    counter++;
+                    if(newMatrix.isValid(i+1,j+1))//only if there is a cell below our current one we check if there is one right to ours below.>
+                    {
+                        newMatrix._matrix[i][j] += _matrix[i+1][j+1];
+                        counter++;
+                    }
+                }
+                if(newMatrix.isValid(i,j-1))//conditions to check if there is a cell left to our current one<
+                {
+                    newMatrix._matrix[i][j] += _matrix[i][j-1];
+                    counter++;
+                    if(newMatrix.isValid(i+1,j-1))//only if there is a cell left to our current one we check if there is one below our left cell.\/
+                    {
+                        newMatrix._matrix[i][j] += _matrix[i+1][j-1];
+                        counter++;
+                    }
+                }
+                if(newMatrix.isValid(i,j+1))//conditions to check if there is a cell right to our current one>
+                {
+                    newMatrix._matrix[i][j] += _matrix[i][j+1];
+                    counter++;
+                    if(newMatrix.isValid(i-1,j+1))//only if there is a cell right to our current one we check if there is one above our right cell.\/
+                    {
+                        newMatrix._matrix[i][j] += _matrix[i-1][j+1];
+                        counter++;
+                    }
+                }
+                int average = newMatrix._matrix[i][j]/counter;
+                newMatrix._matrix[i][j] = average;
+            }
+        }
+        return newMatrix;
+    }
+
+    /** 
+     * This method makes the image rotate 90 degrees clockwise .
+     * @return the new image rotated clockwise.
+     */
+    public Matrix rotateClockwise()
+    {
+        int[][] rotateClockwise = new int[_matrix[0].length][_matrix.length];
+
+        for (int i = 0; i < _matrix[0].length; ++i)//Goes up a row every round of the sub-loop and when the sub-loop finished the main-loop passing a column based on the old Matrix.
+        {
+            for (int j = 0; j < _matrix.length; ++j) 
+            {
+
+                rotateClockwise[i][j] = _matrix[_matrix.length - j - 1][i];
+            }
+        }
+        Matrix newMatrix = new Matrix(rotateClockwise);
+        return newMatrix;
+    }
+
+    /**
+     * This method makes the image rotate 90 degrees counter clockwise .
+     * @return the new image rotated counter clockwise.
+     */
+    public Matrix rotateCounterClockwise()
+    {
+        int[][] rotateCounterClockwise = new int[_matrix[0].length][_matrix.length];
+
+        for (int i = 0; i < _matrix[0].length; ++i)//Goes down a row every round of the sub-loop and when the sub-loop finished the main-loop lessen a column based on the old Matrix.
+        {
+            for (int j = 0; j < _matrix.length; ++j) 
+            {
+
+                rotateCounterClockwise[i][j] = _matrix[j][_matrix[0].length - i - 1];
+            }
+        }
+        Matrix newMatrix = new Matrix(rotateCounterClockwise);
+        return newMatrix;
+    }
+
+}

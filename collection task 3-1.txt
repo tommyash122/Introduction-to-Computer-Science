@@ -1,0 +1,269 @@
+/**
+ *This Collection class contains a collection of boxes from Box3D type.
+ * The Representation goes by an array that keeps the list of boxes.
+ * @author Tommy Ashkenazi 
+ * @version 18/04/19
+ */
+public class Collection
+{
+    private Box3D[] _boxes; // An array Box3D type
+    private int _noOfBoxes; // Represents the number of boxes in the array
+
+    private final int MAX_NUM_BOXES = 100;
+    /**
+     * A constructor that initializes the array to have 100 cell places and zero boxes*/
+    public Collection()
+    {
+        _boxes = new Box3D[MAX_NUM_BOXES];
+        _noOfBoxes = 0;
+
+    }
+
+    /**This method adds a box to the array. It gets the box attributes (basic point,  width, height, length)
+     * adds it to the array and sorting the array from the smallest box volume to the biggest.
+     * @param p - the base point of the box
+     *  @param length - the length of the box
+     * @param width - the width of the box
+     * @param height - the height of the box
+     * @return the new array with the new box that just added if added.
+     */
+    public boolean addBox(Point3D base,int length,int width,int height)
+    {
+        if (_noOfBoxes < MAX_NUM_BOXES) // Only if there is a place available
+        {
+            _boxes[_noOfBoxes] = new Box3D(base,length,width,height);
+            Box3D[] temp = new Box3D[MAX_NUM_BOXES];
+            temp[0] = _boxes[_noOfBoxes];
+            int i ;
+            //A loop that checks if the box in the cell before the one we are trying to add has a bigger volume.
+            // if its true then it copies the one before to the last cell until it finds a cell that the box before is no-bigger and then the new box goes there.
+            for (i = _noOfBoxes ;i>0 && (_boxes[i-1].getVolume()>= _boxes[i].getVolume());)
+            {
+                _boxes[i] = _boxes[i-1];
+                i--;
+                _boxes[i] = temp[0];
+            }
+            _noOfBoxes++;
+            return true; 
+        }
+        else //Full array
+        {
+            return false ; 
+        }
+    }
+
+    /**This method returns the box with the modt upper base corner in the array.
+     * @return the box with the modt upper base corner in the array.
+     */
+    public Box3D mostUpperBaseCorner()
+    {
+        if (_noOfBoxes == 0) // Empty array
+        {
+            return null;
+        }
+        Box3D highest = _boxes[0];//Assume that the first box corner point is highest
+        for (int i=1 ; i<_noOfBoxes ;i++)//checing the array for higher point
+        {
+            if(_boxes[i].getBase().isAbove(highest.getBase()))//if there is higher point its valume bacome the highest
+            {
+                highest = _boxes[i];
+            }
+        }
+        return new Box3D(highest);
+    }
+
+    /**
+     * A method that returns the total surface of all boxes in the array
+     * @return the total surface of all boxes in the array
+     */
+    public double totalSurfaceArea()
+    {
+        if (_noOfBoxes !=0)
+        {
+            double totalSurfaceArea = _boxes[0].getSurfaceArea();
+            for (int i=1 ; i<_noOfBoxes ;i++)
+            {
+                totalSurfaceArea +=  _boxes[i].getSurfaceArea();//adding all the values that is in the array to the summary
+            }
+            return totalSurfaceArea;
+        }
+        else 
+        {
+            return 0;
+        }
+    }
+
+    /**This method returns the longest distance between two array boxes.
+     * @return the longest distance between two array boxes
+     */
+    public double longestDistance()
+    {
+        if (_noOfBoxes <2 )//If there is less then 2 boxes in the array
+        {
+            return 0;
+        }
+        else 
+        {
+            double longestDistance = _boxes[0].distance(_boxes[1]) ;//Assume that the first and second boxes are the ones with the longest distance between them.
+            double temp;
+            for (int i = 0 ; i <_noOfBoxes ;i++ )//These loops checks if there is larger distance value between other 2 boxes in the array
+            {
+                for (int j=i+1; j<_noOfBoxes  ;j++ )
+                {
+                    temp =  _boxes[i].distance(_boxes[j]);
+                    if (temp > longestDistance)
+                    {
+                        longestDistance = temp;
+                    }
+
+                }
+            }
+            return longestDistance;
+        }
+    }
+
+    /**This method gets a box as a parameter and returns a number indicating how many boxes in an array can contain the box received as a parameter.
+     * @param box to check how many boxes from the array can contain it 
+     */
+    public int howManyContains(Box3D box)
+    {
+        if (_noOfBoxes == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            int counter = 0 ;
+            for (int i=0 ; i<_noOfBoxes ; i++)
+            {
+                if (this._boxes[i].contains(box))//If there is a box from our array that can contain the parameter box 
+                {
+                    counter ++;
+                }
+            }
+            return counter ; 
+        }
+    }
+
+    /**This method accepts two indexes (i,j) that Represent limits include i and j and creates a sub-array from the main-array and returns the size of the smallest box 
+     * that can contain the volume of the boxes that is in the sub-array . each one individually.
+     * @param i Determines the number of rows in the array.
+     * @param j Determines the number of columns in the array.
+     * @return the size of the smallest box that can contain the volume of the boxes that is in the sub-array . each one individually. 
+     */
+    public int volumeOfSmallestBox(int i, int j)
+    {
+        if (_noOfBoxes == 0 || i>=_noOfBoxes || j>=_noOfBoxes || i > MAX_NUM_BOXES || j > MAX_NUM_BOXES || i<0 || j<0)
+        {
+            return 0;
+        }
+        else if (i<=j )
+        {
+            int lengthOfLargestBoxInArray = _boxes[j].getLength();
+            int widthOfLargestBoxInArray = _boxes[j].getWidth();
+            int heightOfLargestBoxInArray = _boxes[j].getHeight();
+
+            int tempLength,tempWidth,tempHeight ,k=j+1;
+
+            for (; i<k ; i++)// A loop that make sure that there is no greater value of a box volume in the sub array.
+            {
+                tempLength = _boxes[i].getLength();
+                tempWidth = _boxes[i].getWidth();
+                tempHeight = _boxes[i].getHeight();
+
+                if (tempLength > lengthOfLargestBoxInArray && tempWidth > widthOfLargestBoxInArray && tempHeight > heightOfLargestBoxInArray)
+                {
+                    lengthOfLargestBoxInArray = tempLength ;
+                    widthOfLargestBoxInArray = tempWidth;
+                    heightOfLargestBoxInArray = tempHeight;
+                }
+            }
+            //The volume of the smallest box that can contains the largest box and all others in the sub array.
+            int volumeOfSmallestBox = (lengthOfLargestBoxInArray+1)*(widthOfLargestBoxInArray+1)*(heightOfLargestBoxInArray+1);
+
+            return volumeOfSmallestBox ;
+        }
+        else if (j<i)
+        {
+            int lengthOfLargestBoxInArray = _boxes[i].getLength();
+            int widthOfLargestBoxInArray = _boxes[i].getWidth();
+            int heightOfLargestBoxInArray = _boxes[i].getHeight();
+
+            int tempLength,tempWidth,tempHeight ,k=i+1;
+
+            for (; j<k ; j++)// A loop that make sure that there is no greater value of a box volume in the sub array.
+            {
+                tempLength = _boxes[j].getLength();
+                tempWidth = _boxes[j].getWidth();
+                tempHeight = _boxes[j].getHeight();
+
+                if (tempLength > lengthOfLargestBoxInArray && tempWidth > widthOfLargestBoxInArray && tempHeight > heightOfLargestBoxInArray)
+                {
+                    lengthOfLargestBoxInArray = tempLength ;
+                    widthOfLargestBoxInArray = tempWidth;
+                    heightOfLargestBoxInArray = tempHeight;
+                }
+            }
+            //The volume of the smallest box that can contains the largest box and all others in the sub array.
+            int volumeOfSmallestBox = (lengthOfLargestBoxInArray+1)*(widthOfLargestBoxInArray+1)*(heightOfLargestBoxInArray+1);
+
+            return volumeOfSmallestBox ;
+        }
+        else 
+        {
+            return 0;
+        }
+
+    }
+
+    /**This method returns a copy of the our current array 
+     * @return  a copy of the our current array 
+     */
+    public Box3D[] getBoxes()
+    {
+        Box3D[] newBoxes = new Box3D[_noOfBoxes];//creates a new array of Box3D class
+        for (int i = 0 ; i<_noOfBoxes ; i++)//gets all the values from our array
+        {
+            newBoxes[i] = _boxes[i];
+        }
+        return newBoxes;
+    }
+
+    /**this nethod returns the number of boxes in the array
+     * @return the number of boxes in the array
+     */
+    public int getNumOfBoxes()
+    {
+        int counter = 0;
+        for (int i=0 ; i<_noOfBoxes ; i++)
+        {
+            counter++;
+        }
+        return counter;
+    }
+
+    /**
+    Returns a string representation of this Collection.
+    @over toString in class java.lang.Object*/
+    public String toString()
+    {
+        if (_noOfBoxes>0)
+        {
+            int i = 0;
+            String string ="Box no. "+1+":"+ _boxes[0].toString()+"\n" ;
+            String string2 ;
+            for ( i=1 ; i<_noOfBoxes ; i++) 
+            {
+                string2 ="Box no. "+(i+1)+":"+ _boxes[i].toString()+"\n";
+                string += string2;
+            }
+
+            return string;
+        }
+        else
+        {
+            return "Empty array";
+        }
+    }
+
+}
